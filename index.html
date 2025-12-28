@@ -2,109 +2,163 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8" />
-<title>Duck Race Game</title>
+<title>Đua Vịt — Icon nhiều màu</title>
 
 <style>
   body { font-family: Arial; background:#eef5ff; }
   h2 { text-align:center }
   #panel { text-align:center; margin:10px 0 }
+  #names { width:340px; margin:10px auto; display:none }
+  #names input { width:100%; margin:6px 0; padding:6px }
+
   #track {
     width: 900px; margin: 20px auto; padding:10px;
     border:3px solid #333; background:#fff; position:relative;
   }
-  .lane {
-    height:70px; border-bottom:1px dashed #bbb;
-    position:relative;
-  }
+  .lane { height:90px; border-bottom:1px dashed #bbb; position:relative }
+
   .duck {
-    position:absolute; left:0; top:15px;
-    font-size:38px;
-    transition: left .08s linear;
+    position:absolute; left:0; top:18px;
+    width:64px; height:64px;
   }
-  .finish {
-    position:absolute; right:0; top:0;
-    width:6px; height:100%; background:red;
-  }
+  .duck svg { width:100%; height:100%; }
+
+  /* 🎨 Màu khác nhau cho từng con */
+  .c1 { filter: hue-rotate(0deg); }
+  .c2 { filter: hue-rotate(45deg); }
+  .c3 { filter: hue-rotate(100deg); }
+  .c4 { filter: hue-rotate(160deg); }
+  .c5 { filter: hue-rotate(220deg); }
+  .c6 { filter: hue-rotate(300deg); }
+
+  .label { position:absolute; left:75px; top:-2px; font-size:14px }
+  .finish { position:absolute; right:0; top:0; width:6px; height:100%; background:red }
   button { padding:8px 14px; margin:0 6px }
 </style>
 </head>
 
 <body>
 
-<h2>🦆 Game Đua Vịt</h2>
+<h2>🦆 Đua vịt — Icon cùng hình, mỗi con 1 màu</h2>
 
 <div id="panel">
   Số lượng vịt:
-  <select id="count">
-    <option>3</option><option>4</option><option>5</option><option>6</option>
-  </select>
+  <input id="count" type="number" min="1" max="6" value="3" style="width:70px">
+  <button onclick="createNameInputs()">Tạo ô nhập tên</button>
   <button onclick="setupTrack()">Tạo đường đua</button>
   <button onclick="startRace()">Bắt đầu</button>
   <button onclick="resetRace()">Chơi lại</button>
 </div>
 
+<div id="names"></div>
 <div id="track"></div>
 
 <script>
-const DUCK_ICONS = ["🦆","🟡","🟢","🟣","🟠","🧡"];
+const DUCK_SVG = `
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#ffd966" d="M10 34c0 12 10 22 22 22s22-10 22-22c0-6-3-10-3-14 0-4 4-6 7-6-2-4-7-6-11-6-6 0-10 4-11 8-2-1-4-2-7-2-6 0-11 5-11 11 0 4 2 7 4 9-1 1-2 3-2 5z"/>
+  <circle cx="42" cy="20" r="3" fill="#000"/>
+  <path d="M50 16c2 2 6 2 8 0-1-3-4-5-7-5-1 0-2 0-3 1 1 1 1 3 2 4z" fill="#ff9900"/>
+</svg>
+`;
+
+let duckData = [];
 let lanes = [];
 let finished = false;
 let timer = null;
 
+// Tạo ô nhập tên
+function createNameInputs(){
+  const n = parseInt(document.getElementById("count").value);
+  const box = document.getElementById("names");
+  box.innerHTML = "";
+  for(let i=1;i<=n;i++){
+    const inp = document.createElement("input");
+    inp.placeholder = "Tên vịt #" + i;
+    inp.id = "name_"+i;
+    box.appendChild(inp);
+  }
+  box.style.display = "block";
+}
+
+// Thu thập tên
+function collectDuckData(){
+  const n = parseInt(document.getElementById("count").value);
+  duckData = [];
+  for(let i=1;i<=n;i++){
+    const name = document.getElementById("name_"+i)?.value?.trim();
+    duckData.push({ name: name || ("Vịt " + i) });
+  }
+}
+
+// Tạo đường đua
 function setupTrack(){
   clearInterval(timer);
   finished = false;
+  collectDuckData();
   lanes = [];
-  const n = parseInt(document.getElementById("count").value);
+
   const track = document.getElementById("track");
   track.innerHTML = "";
 
-  for(let i=0;i<n;i++){
+  duckData.forEach((d, idx)=>{
     const lane = document.createElement("div");
     lane.className = "lane";
 
     const duck = document.createElement("div");
-    duck.className = "duck";
-    duck.textContent = DUCK_ICONS[i % DUCK_ICONS.length];
+    duck.className = "duck c" + (idx+1); // màu theo thứ tự
+    duck.innerHTML = DUCK_SVG;
+
+    const label = document.createElement("div");
+    label.className = "label";
+    label.textContent = d.name;
 
     const finish = document.createElement("div");
     finish.className = "finish";
 
     lane.appendChild(duck);
+    lane.appendChild(label);
     lane.appendChild(finish);
     track.appendChild(lane);
 
-    lanes.push({ el: duck, pos: 0, speed: 2 + Math.random()*3 });
-  }
+    lanes.push({
+      el: duck,
+      pos: 0,
+      speed: 2 + Math.random()*3,
+      name: d.name
+    });
+  });
 }
 
+// Đua
 function startRace(){
   if(finished || lanes.length === 0) return;
 
   const track = document.getElementById("track");
-  const limit = track.clientWidth - 80;
+  const limit = track.clientWidth - 110;
 
   timer = setInterval(()=>{
-    lanes.forEach((lane, i)=>{
-      // tăng tốc ngẫu nhiên nhẹ trong quá trình đua
-      lane.pos += lane.speed + Math.random()*4;
-      lane.el.style.left = lane.pos + "px";
+    lanes.forEach(l=>{
+      l.pos += l.speed + Math.random()*4;
+      l.el.style.left = l.pos + "px";
 
-      if(lane.pos >= limit && !finished){
+      if(l.pos >= limit && !finished){
         finished = true;
         clearInterval(timer);
-        alert("🏆 Vịt số " + (i+1) + " đã chiến thắng!");
+        alert("🏆 Chiến thắng: " + l.name);
       }
     });
   }, 80);
 }
 
+// Reset
 function resetRace(){
-  lanes.forEach(l => { l.pos = 0; l.el.style.left = "0px"; });
+  lanes.forEach(l=>{
+    l.pos = 0;
+    l.el.style.left = "0px";
+  });
   finished = false;
 }
-
-setupTrack(); // khởi tạo mặc định khi mở trang
 </script>
 
 </body>
