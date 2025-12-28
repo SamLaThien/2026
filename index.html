@@ -176,10 +176,6 @@ function updateRanking(){
     const li=document.createElement("li");
     li.textContent=`${i+1}. ${d.name} — ${d.time.toFixed(2)}s`;
 
-    if(i===0){ li.classList.add("gold"); d.el.classList.add(effects[0]); }
-    else if(i===1){ li.classList.add("silver"); d.el.classList.add(effects[1]); }
-    else if(i===2){ li.classList.add("bronze"); d.el.classList.add(effects[2]); }
-
     ranking.appendChild(li);
   });
 }
