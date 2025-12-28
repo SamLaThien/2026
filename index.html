@@ -89,6 +89,7 @@ button{
 <script>
 const colors=["#ffbe0b","#fb5607","#ff006e","#8338ec","#3a86ff","#06d6a0","#ff9f1c","#ffd166"];
 const effects=["win-wobble","win-rotate","win-bounce"];
+
 let startTime, finished=[];
 
 function startRace(){
@@ -98,7 +99,9 @@ function startRace(){
   finished=[];
 
   const names=document.getElementById("duckNames").value
-    .split("\n").map(x=>x.trim()).filter(Boolean);
+    .split("\n")
+    .map(x=>x.trim())
+    .filter(x=>x !== "");   // xoá dòng trống
 
   if(!names.length){alert("Nhập tên vịt trước!");return;}
 
@@ -148,33 +151,39 @@ function animateDuck(duck,timeEl){
 }
 
 function onFinish(duck,t){
-  if(finished.find(x=>x.name===duck.dataset.name))return;
-  finished.push({name:duck.dataset.name,time:t,color:duck.dataset.color,el:duck});
+  finished.push({
+    name:duck.dataset.name,
+    time:parseFloat(t),
+    color:duck.dataset.color,
+    el:duck
+  });
 
-  // random hiệu ứng
-  duck.classList.add(effects[Math.floor(Math.random()*effects.length)]);
-
-  if(finished.length===document.querySelectorAll(".duck").length){
-    updateRanking();
-  }
+  updateRanking();
 }
 
 function updateRanking(){
-  finished.sort((a,b)=>a.time-b.time);
   const ranking=document.getElementById("ranking");
   ranking.innerHTML="";
 
+  // sắp xếp tăng dần thời gian
+  finished.sort((a,b)=>a.time-b.time);
+
+  // bỏ hiệu ứng cũ trước
+  document.querySelectorAll(".duck")
+    .forEach(d=>d.classList.remove("win-wobble","win-rotate","win-bounce"));
+
   finished.forEach((d,i)=>{
     const li=document.createElement("li");
-    li.textContent=`${i+1}. ${d.name} — ${d.time}s`;
+    li.textContent=`${i+1}. ${d.name} — ${d.time.toFixed(2)}s`;
 
-    if(i===0) li.classList.add("gold");
-    else if(i===1) li.classList.add("silver");
-    else if(i===2) li.classList.add("bronze");
+    if(i===0){ li.classList.add("gold"); d.el.classList.add(effects[0]); }
+    else if(i===1){ li.classList.add("silver"); d.el.classList.add(effects[1]); }
+    else if(i===2){ li.classList.add("bronze"); d.el.classList.add(effects[2]); }
 
     ranking.appendChild(li);
   });
 }
 </script>
+
 </body>
 </html>
