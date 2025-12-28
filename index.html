@@ -1,225 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="utf-8">
-<title>Duck Race Game</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🐤 Duck Racing Game</title>
 <style>
 body{
-  font-family:'Trebuchet MS',Arial;
-  text-align:center;
-  background:linear-gradient(160deg,#1e3c72,#2a5298);
-  color:#fff;
+  font-family:"Baloo 2",system-ui;
+  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  color:#fff;margin:0;padding:0;
 }
-
-.game-box{
-  width:920px;
-  margin:25px auto;
-  background:#101522;
-  border-radius:22px;
-  box-shadow:0 20px 40px rgba(0,0,0,.45);
-  padding:20px 25px 30px;
-  border:2px solid #2c3d69;
+.container{
+  max-width:900px;margin:auto;padding:16px;
 }
-
-h2{margin-top:5px;color:#ffd166}
-
+.card{
+  background:#111a22;border-radius:18px;
+  padding:16px;margin-bottom:14px;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+h1{margin-top:6px;text-align:center}
 textarea{
-  width:340px;
-  height:120px;
-  border-radius:12px;
-  border:2px solid #4c6fff;
-  background:#0f1530;
-  color:#fff;
-  padding:10px;
-  outline:none;
+  width:100%;min-height:90px;border-radius:12px;
+  border:none;padding:12px;font-size:15px;
 }
-
 button{
-  margin-top:12px;
-  padding:10px 22px;
-  font-size:16px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  background:#4c6fff;
-  color:#fff;
-  font-weight:600;
-  box-shadow:0 6px 0 #2232a8;
+  width:100%;padding:12px;border:none;
+  border-radius:12px;font-size:16px;
+  background:#ffb703;color:#000;font-weight:700;
 }
-button:active{transform:translateY(3px);box-shadow:0 3px 0 #2232a8;}
-
 .track{
-  position:relative;
-  width:860px;
-  margin:10px auto;
-  background:linear-gradient(#26314d,#1c243d);
-  border:2px dashed #6273ff;
-  border-radius:18px;
-  padding:16px 10px;
-  overflow:hidden;
+  margin-top:14px;border-radius:16px;
+  background:#0c131a;padding:10px;overflow:hidden;
 }
-
-.finish{
-  position:absolute;
-  right:12px;top:10px;bottom:10px;
-  width:8px;border-radius:6px;
-  background:repeating-linear-gradient(
-    45deg,#ff2e2e 0 8px,#ffd1d1 8px 16px);
-}
-
-/* 🔹 dùng biến --x để di chuyển ngang */
 .duck{
-  --x: 0px;
-  transform: translateX(var(--x));
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:20px;
-  padding:6px 12px;
-  border-radius:14px;
-  background:#0f1530;
-  box-shadow:0 8px 20px rgba(0,0,0,.45);
-  transition: transform .12s linear;
-  animation:wiggle 1s infinite ease-in-out;
+  display:flex;align-items:center;
+  gap:8px;font-size:17px;font-weight:700;
+  padding:8px 10px;border-radius:12px;
+  margin-bottom:6px;position:relative;
+  transform:translateX(0);
+  transition:transform .3s ease-out;
 }
-
-/* 🔹 wiggle chỉ lắc theo trục Y, KHÔNG đụng trục X */
-@keyframes wiggle{
-  0%,100%{transform:translateX(var(--x)) translateY(0)}
-  50%{transform:translateX(var(--x)) translateY(-2px)}
+.duck span.time{font-size:12px;opacity:.8}
+.finish-line{
+  position:absolute;right:10px;top:0;bottom:0;
+  border-left:3px dashed #ffb703;
 }
-
-.icon{font-size:30px}
-
-.duck.jump{animation:jump .45s ease-out forwards}
-@keyframes jump{
-  0%{transform:translateX(var(--x)) translateY(0) scale(1)}
-  40%{transform:translateX(var(--x)) translateY(-18px) scale(1.1)}
-  100%{transform:translateX(var(--x)) translateY(0) scale(1)}
+.board{
+  margin-top:14px;
 }
-
-#leaderboard{
-  margin-top:18px;
-  background:#0f1530;
-  width:420px;
-  border-radius:18px;
-  padding:14px 18px;
-  border:2px solid #4c6fff;
-  display:none;
+.board li{
+  padding:6px 10px;border-radius:10px;
+  margin-bottom:6px;list-style:none;
+  background:#15212b;
 }
-#leaderboard.show{animation:pop .35s ease-out forwards}
-@keyframes pop{
-  0%{transform:scale(.6);opacity:0}
-  100%{transform:scale(1);opacity:1}
+.board li.gold{background:#ffd70022;border:1px solid #ffd700}
+.board li.silver{background:#c0c0c022;border:1px solid #c0c0c0}
+.board li.bronze{background:#cd7f3222;border:1px solid #cd7f32}
+.win-wobble{animation:wobble 1s infinite;}
+.win-rotate{animation:spin 1s infinite;}
+.win-bounce{animation:bounce 1s infinite;}
+@keyframes wobble{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media(max-width:600px){
+  .duck{font-size:15px}
 }
 </style>
 </head>
-
 <body>
-<div class="game-box">
-<h2>🐥 Duck Racing Game</h2>
+<div class="container">
+  <h1>🐤 DUCK RACING</h1>
 
-<p>Nhập tên vịt (mỗi dòng một con):</p>
+  <div class="card">
+    <p>Nhập tên vịt (mỗi dòng 1 tên):</p>
+    <textarea id="duckNames"></textarea>
+    <button onclick="startRace()">Bắt đầu đua</button>
+  </div>
 
-<textarea id="nameInput" placeholder="Vịt vàng
-Vịt xanh
-Vịt hồng"></textarea><br>
+  <div class="card track" id="track"></div>
+  <div class="finish-line"></div>
 
-<button onclick="startRace()">🚦 Start Race</button>
-
-<div id="raceArea"></div>
-
-<div id="leaderboard">
-  <h3>🏆 Bảng xếp hạng</h3>
-  <ol id="rankList"></ol>
-</div>
+  <div class="card">
+    <h3>🏆 Bảng xếp hạng</h3>
+    <ul id="ranking" class="board"></ul>
+  </div>
 </div>
 
 <script>
-const colors=["#ffb703","#06d6a0","#9b5de5","#ef476f","#ffd166","#4cc9f0"];
-
-let results=[],totalDucks=0;
+const colors=["#ffbe0b","#fb5607","#ff006e","#8338ec","#3a86ff","#06d6a0","#ff9f1c","#ffd166"];
+const effects=["win-wobble","win-rotate","win-bounce"];
+let startTime, finished=[];
 
 function startRace(){
-  const area=document.getElementById("raceArea");
-  const board=document.getElementById("leaderboard");
-  const list=document.getElementById("rankList");
+  const track=document.getElementById("track");
+  const ranking=document.getElementById("ranking");
+  track.innerHTML=""; ranking.innerHTML="";
+  finished=[];
 
-  area.innerHTML="";
-  board.style.display="none";
-  list.innerHTML="";
-  results=[];
+  const names=document.getElementById("duckNames").value
+    .split("\n").map(x=>x.trim()).filter(Boolean);
 
-  const names=document.getElementById("nameInput")
-    .value.split("\n").map(x=>x.trim()).filter(x=>x);
+  if(!names.length){alert("Nhập tên vịt trước!");return;}
 
-  if(!names.length){alert("Hãy nhập tên vịt!");return;}
-
-  totalDucks=names.length;
+  startTime=performance.now();
 
   names.forEach((name,i)=>{
-    const track=document.createElement("div");
-    track.className="track";
-
     const duck=document.createElement("div");
     duck.className="duck";
+    duck.style.background=colors[i%colors.length]+"33";
+    duck.dataset.name=name;
+    duck.dataset.color=colors[i%colors.length];
 
     const icon=document.createElement("span");
-    icon.className="icon";
-    icon.textContent="🦆";
-    icon.style.filter=`drop-shadow(0 0 10px ${colors[i%colors.length]})`;
+    icon.textContent="🐤";
+    icon.style.color=colors[i%colors.length];
 
     const label=document.createElement("span");
     label.textContent=name;
 
-    duck.append(icon,label);
+    const time=document.createElement("span");
+    time.className="time";
+    time.textContent="⏱...";
 
-    const finish=document.createElement("div");
-    finish.className="finish";
+    duck.append(icon,label,time);
+    track.appendChild(duck);
 
-    track.append(duck,finish);
-    area.append(track);
-
-    animateDuck(duck,name);
+    animateDuck(duck,time);
   });
 }
 
-function animateDuck(duck,name){
-  let pos=0,max=760,base=1+Math.random()*0.7;
+function animateDuck(duck,timeEl){
+  let pos=0;
+  const finish=90+Math.random()*6;
+  const speed=1+Math.random()*1.3;
 
-  const timer=setInterval(()=>{
-    pos += (Math.random()*3+1.4)*base;
-    if(pos>max) pos=max;
+  const move=setInterval(()=>{
+    pos+=Math.random()*speed;
+    duck.style.transform=`translateX(${pos}%)`;
 
-    duck.style.setProperty("--x",pos+"px");
-
-    if(pos>=max){
-      clearInterval(timer);
-      duck.classList.add("jump");
-      finishDuck(name);
+    if(pos>=finish){
+      clearInterval(move);
+      const t=((performance.now()-startTime)/1000).toFixed(2);
+      timeEl.textContent=`⏱ ${t}s`;
+      onFinish(duck,t);
     }
-  },120);
+  },100);
 }
 
-function finishDuck(name){
-  results.push(name);
-  if(results.length===totalDucks) showLeaderboard();
+function onFinish(duck,t){
+  if(finished.find(x=>x.name===duck.dataset.name))return;
+  finished.push({name:duck.dataset.name,time:t,color:duck.dataset.color,el:duck});
+
+  // random hiệu ứng
+  duck.classList.add(effects[Math.floor(Math.random()*effects.length)]);
+
+  if(finished.length===document.querySelectorAll(".duck").length){
+    updateRanking();
+  }
 }
 
-function showLeaderboard(){
-  const board=document.getElementById("leaderboard");
-  const list=document.getElementById("rankList");
+function updateRanking(){
+  finished.sort((a,b)=>a.time-b.time);
+  const ranking=document.getElementById("ranking");
+  ranking.innerHTML="";
 
-  results.forEach((name,i)=>{
+  finished.forEach((d,i)=>{
     const li=document.createElement("li");
-    li.textContent=(i+1)+". "+name;
-    list.append(li);
-  });
+    li.textContent=`${i+1}. ${d.name} — ${d.time}s`;
 
-  board.style.display="inline-block";
-  board.classList.add("show");
+    if(i===0) li.classList.add("gold");
+    else if(i===1) li.classList.add("silver");
+    else if(i===2) li.classList.add("bronze");
+
+    ranking.appendChild(li);
+  });
 }
 </script>
 </body>
