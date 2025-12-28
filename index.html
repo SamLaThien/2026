@@ -14,7 +14,17 @@ button{width:100%;padding:12px;border-radius:12px;border:none;margin-top:8px;fon
 .track{position:relative;margin-top:12px;background:#020617;border-radius:12px;border:1px solid #1e293b;padding:10px;overflow:hidden}
 .finish{position:absolute;right:6px;top:6px;bottom:6px;width:3px;background:#ef4444}
 .duck{display:flex;align-items:center;gap:8px;font-size:20px;margin:8px 0;position:relative;left:0;transition:left .15s linear}
-#board li{list-style:none;margin:6px 0;padding:8px;border-radius:10px;background:#020617}
+#board li{
+  list-style:none;
+  margin:6px 0;
+  padding:10px;
+  border-radius:10px;
+  background:#020617;
+  color:#fff;          /* 👈 đảm bảo chữ sáng */
+  font-weight:600;
+  opacity:1;           /* 👈 bỏ làm mờ */
+}
+
 .top1{background:#fde047;color:#000}
 .top2{background:#e5e7eb;color:#000}
 .top3{background:#fb923c;color:#000}
