@@ -1,200 +1,131 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>🦆 Duck Racing Game</title>
-
+<title>Duck Racing Game</title>
 <style>
 body{
-  font-family:"Baloo 2",system-ui;
-  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
-  color:#fff;margin:0;padding:0;
+  font-family: Poppins, sans-serif;
+  background: linear-gradient(120deg,#0f172a,#020617);
+  color:#fff; margin:0; padding:0;
+  display:flex; justify-content:center;
 }
-
 .container{
-  max-width:1100px;
-  margin:auto;
-  padding:14px;
+  max-width:900px; width:100%;
+  padding:16px;
 }
-
-/* ===== Cards ===== */
 .card{
-  background:#111a22;
+  background:#111827;
   border-radius:18px;
   padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
 }
+h2{margin-top:0}
 
-h1{margin:6px 0 10px;text-align:center}
-
-/* ===== Inputs ===== */
+.input-box{
+  margin-bottom:10px;
+}
 textarea{
-  width:100%;
-  min-height:110px;
-  border-radius:12px;
-  border:none;
-  padding:12px;
-  font-size:15px;
+  width:100%; height:90px;
+  border-radius:12px; border:1px solid #334155;
+  padding:10px; background:#020617; color:#fff;
 }
-
 button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  background:#ffb703;
-  color:#000;
-  font-weight:700;
+  width:100%; padding:12px;
+  border-radius:12px; border:none;
+  background:#22c55e; color:#000;
+  font-weight:700; font-size:15px;
 }
+button:disabled{opacity:.5}
 
-/* ===== Track & Ducks ===== */
 .track{
-  margin-top:8px;
-  border-radius:16px;
-  background:#0c131a;
+  margin-top:14px;
+  background:#020617;
+  border-radius:14px;
+  border:1px solid #1e293b;
   padding:10px;
   overflow:hidden;
-  position:relative;
-  min-height:70px;
 }
-
-.finish-line{
-  position:absolute;
-  right:18px;
-  top:10px;
-  bottom:10px;
-  width:0;
-  border-left:3px dashed #ffb703;
-  opacity:.9;
-}
-
 .duck{
-  display:flex;
-  align-items:center;
+  display:flex; align-items:center;
   gap:8px;
-  font-size:18px;
-  font-weight:700;
-  padding:8px 10px;
-  border-radius:12px;
-  margin-bottom:6px;
+  font-size:20px;
+  margin:6px 0;
   position:relative;
   transform:translateX(0);
-  transition:transform .25s ease-out;
+  transition:transform .25s linear;
 }
-.duck span.time{font-size:12px;opacity:.8}
-
-/* ===== Leaderboard ===== */
-.board{margin-top:6px;padding-left:0}
-.board li{
-  padding:6px 10px;
-  border-radius:10px;
-  margin-bottom:6px;
-  list-style:none;
-  background:#15212b;
+.duck span.name{
+  font-size:14px;
+  opacity:.8;
 }
-.board li.gold{background:#ffd70022;border:1px solid #ffd700}
-.board li.silver{background:#c0c0c022;border:1px solid #c0c0c0}
-.board li.bronze{background:#cd7f3222;border:1px solid #cd7f32}
-
-/* ===== Responsive ===== */
-@media(max-width:600px){
-  .duck{font-size:16px}
+.finish-line{
+  position:absolute; right:6px; top:6px; bottom:6px;
+  width:3px; background:#dc2626;
 }
+#board{margin-top:14px}
+#board li{
+  list-style:none; padding:8px 10px;
+  margin:6px 0; border-radius:10px;
+  background:#020617;
+}
+.top1{background:#facc15;color:#000}
+.top2{background:#e5e7eb;color:#000}
+.top3{background:#f97316;color:#000}
 
-/* Desktop: bố cục 2 cột */
-@media(min-width:900px){
-  .layout{
-    display:grid;
-    grid-template-columns:1fr 320px;
-    gap:14px;
-    align-items:flex-start;
-  }
-  #leaderboardCard{
-    position:sticky;
-    top:14px;
-  }
+.win-bounce{animation:pop 1s ease infinite}
+.win-shake{animation:shake .8s ease infinite}
+.win-glow{animation:glow 1.2s ease infinite}
+
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 0 #fff)}50%{filter:drop-shadow(0 0 16px #38bdf8)}}
+
+.timer{margin-top:6px;font-size:13px;opacity:.8}
+
+/* Responsive */
+@media (min-width:900px){
+  .container{padding:24px}
+  .duck{font-size:22px}
 }
 </style>
 </head>
-
 <body>
 <div class="container">
+  <div class="card">
+    <h2>🐤 Duck Racing</h2>
 
-  <h1>🦆 DUCK RACING</h1>
-
-  <div class="layout">
-
-    <!-- LEFT: GAME -->
-    <div>
-      <div class="card">
-        <p>Nhập tên vịt (mỗi dòng 1 tên):</p>
-        <textarea id="duckNames"></textarea>
-        <button onclick="startRace()">Bắt đầu đua</button>
-      </div>
-
-      <div class="card track" id="track">
-        <div class="finish-line"></div>
-      </div>
+    <div class="input-box">
+      <p>Nhập tên (mỗi dòng 1 người):</p>
+      <textarea id="names"></textarea>
     </div>
 
-    <!-- RIGHT: LEADERBOARD -->
-    <div class="card" id="leaderboardCard">
-      <h3>🏆 Bảng xếp hạng</h3>
-      <ul id="ranking" class="board"></ul>
-    </div>
+    <button id="startBtn">Bắt đầu đua</button>
+    <div class="timer" id="timer"></div>
 
+    <div class="track" id="track"></div>
+    <div class="finish-line"></div>
+
+    <h3>Bảng xếp hạng</h3>
+    <ul id="board"></ul>
   </div>
 </div>
 
 <script>
-const colors=["#ffbe0b","#fb5607","#ff006e","#8338ec",
-              "#3a86ff","#06d6a0","#ff9f1c","#ffd166"];
+const startBtn = document.getElementById("startBtn");
+const track = document.getElementById("track");
+const board = document.getElementById("board");
+const timerEl = document.getElementById("timer");
 
-let startTime, finished=[];
+let ducks = [];
+let finished = [];
+let running = false;
+let startTime = 0;
+let timerId = null;
 
-function startRace(){
-  const track=document.getElementById("track");
-  const ranking=document.getElementById("ranking");
-  track.querySelectorAll(".duck").forEach(e=>e.remove());
-  ranking.innerHTML="";
-  finished=[];
-
-  const names=document.getElementById("duckNames").value
-    .split("\n").map(x=>x.trim()).filter(x=>x!=="");
-
-  if(!names.length){
-    alert("Nhập tên vịt trước!");
-    return;
-  }
-
-  startTime=performance.now();
-
-  names.forEach((name,i)=>{
-    const duck=document.createElement("div");
-    duck.className="duck";
-    duck.style.background=colors[i%colors.length]+"33";
-    duck.dataset.name=name;
-    duck.dataset.color=colors[i%colors.length];
-
-    const icon=document.createElement("span");
-    icon.textContent="🦆";
-    icon.style.color=colors[i%colors.length];
-
-    const label=document.createElement("span");
-    label.textContent=name;
-
-    const time=document.createElement("span");
-    time.className="time";
-    time.textContent="⏱...";
-
-    duck.append(icon,label,time);
-    track.appendChild(duck);
-
-    animateDuck(duck,time);
-  });
+function randomEffect(el){
+  const effects = ["win-bounce","win-shake","win-glow"];
+  el.classList.add(effects[Math.floor(Math.random()*effects.length)]);
 }
 
-function animateDuck(duck,timeE
+funct
