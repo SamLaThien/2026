@@ -35,8 +35,6 @@ textarea{
   outline:none;
 }
 
-textarea::placeholder{color:#aaa}
-
 button{
   margin-top:12px;
   padding:10px 22px;
@@ -48,12 +46,8 @@ button{
   color:#fff;
   font-weight:600;
   box-shadow:0 6px 0 #2232a8;
-  transition:.15s;
 }
-button:active{
-  transform:translateY(3px);
-  box-shadow:0 3px 0 #2232a8;
-}
+button:active{transform:translateY(3px);box-shadow:0 3px 0 #2232a8;}
 
 .track{
   position:relative;
@@ -68,16 +62,16 @@ button:active{
 
 .finish{
   position:absolute;
-  right:12px;
-  top:10px;
-  bottom:10px;
-  width:8px;
-  border-radius:6px;
-  background: repeating-linear-gradient(
+  right:12px;top:10px;bottom:10px;
+  width:8px;border-radius:6px;
+  background:repeating-linear-gradient(
     45deg,#ff2e2e 0 8px,#ffd1d1 8px 16px);
 }
 
+/* 🔹 dùng biến --x để di chuyển ngang */
 .duck{
+  --x: 0px;
+  transform: translateX(var(--x));
   position:relative;
   display:flex;
   align-items:center;
@@ -87,24 +81,23 @@ button:active{
   border-radius:14px;
   background:#0f1530;
   box-shadow:0 8px 20px rgba(0,0,0,.45);
-  transform:translateX(0);
-  transition:transform .12s linear;
+  transition: transform .12s linear;
   animation:wiggle 1s infinite ease-in-out;
 }
+
+/* 🔹 wiggle chỉ lắc theo trục Y, KHÔNG đụng trục X */
 @keyframes wiggle{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-2px)}
+  0%,100%{transform:translateX(var(--x)) translateY(0)}
+  50%{transform:translateX(var(--x)) translateY(-2px)}
 }
 
 .icon{font-size:30px}
 
-.duck.jump{
-  animation:jump .45s ease-out forwards;
-}
+.duck.jump{animation:jump .45s ease-out forwards}
 @keyframes jump{
-  0%{transform:translateY(0) scale(1)}
-  40%{transform:translateY(-18px) scale(1.1)}
-  100%{transform:translateY(0) scale(1)}
+  0%{transform:translateX(var(--x)) translateY(0) scale(1)}
+  40%{transform:translateX(var(--x)) translateY(-18px) scale(1.1)}
+  100%{transform:translateX(var(--x)) translateY(0) scale(1)}
 }
 
 #leaderboard{
@@ -115,24 +108,17 @@ button:active{
   padding:14px 18px;
   border:2px solid #4c6fff;
   display:none;
-  box-shadow:0 12px 30px rgba(0,0,0,.45);
 }
-
 #leaderboard.show{animation:pop .35s ease-out forwards}
 @keyframes pop{
   0%{transform:scale(.6);opacity:0}
   100%{transform:scale(1);opacity:1}
 }
-
-#leaderboard h3{margin:4px 0 8px;color:#ffd166}
-#leaderboard ol{margin:0;padding-left:22px}
-#leaderboard li{margin:4px 0}
 </style>
 </head>
 
 <body>
 <div class="game-box">
-
 <h2>🐥 Duck Racing Game</h2>
 
 <p>Nhập tên vịt (mỗi dòng một con):</p>
@@ -152,42 +138,40 @@ Vịt hồng"></textarea><br>
 </div>
 
 <script>
-const colors = ["#ffb703","#06d6a0","#9b5de5","#ef476f",
-                "#ffd166","#4cc9f0","#72efdd","#c77dff"];
+const colors=["#ffb703","#06d6a0","#9b5de5","#ef476f","#ffd166","#4cc9f0"];
 
-let results = [], totalDucks = 0;
+let results=[],totalDucks=0;
 
 function startRace(){
-  const area = document.getElementById("raceArea");
-  const board = document.getElementById("leaderboard");
-  const list = document.getElementById("rankList");
+  const area=document.getElementById("raceArea");
+  const board=document.getElementById("leaderboard");
+  const list=document.getElementById("rankList");
 
-  area.innerHTML = "";
+  area.innerHTML="";
   board.style.display="none";
-  board.classList.remove("show");
-  list.innerHTML = "";
-  results = [];
+  list.innerHTML="";
+  results=[];
 
-  const names = document.getElementById("nameInput")
+  const names=document.getElementById("nameInput")
     .value.split("\n").map(x=>x.trim()).filter(x=>x);
 
-  if(!names.length){ alert("Hãy nhập tên vịt!"); return; }
+  if(!names.length){alert("Hãy nhập tên vịt!");return;}
 
-  totalDucks = names.length;
+  totalDucks=names.length;
 
   names.forEach((name,i)=>{
-    const track = document.createElement("div");
+    const track=document.createElement("div");
     track.className="track";
 
-    const duck = document.createElement("div");
+    const duck=document.createElement("div");
     duck.className="duck";
 
-    const icon = document.createElement("span");
+    const icon=document.createElement("span");
     icon.className="icon";
     icon.textContent="🦆";
     icon.style.filter=`drop-shadow(0 0 10px ${colors[i%colors.length]})`;
 
-    const label = document.createElement("span");
+    const label=document.createElement("span");
     label.textContent=name;
 
     duck.append(icon,label);
@@ -203,13 +187,13 @@ function startRace(){
 }
 
 function animateDuck(duck,name){
-  let pos=0, max=760;
-  const base = 1.1 + Math.random()*0.7;
+  let pos=0,max=760,base=1+Math.random()*0.7;
 
-  const timer = setInterval(()=>{
+  const timer=setInterval(()=>{
     pos += (Math.random()*3+1.4)*base;
     if(pos>max) pos=max;
-    duck.style.transform=`translateX(${pos}px)`;
+
+    duck.style.setProperty("--x",pos+"px");
 
     if(pos>=max){
       clearInterval(timer);
@@ -230,12 +214,12 @@ function showLeaderboard(){
 
   results.forEach((name,i)=>{
     const li=document.createElement("li");
-    li.textContent=`${i+1}. ${name}`;
+    li.textContent=(i+1)+". "+name;
     list.append(li);
   });
 
   board.style.display="inline-block";
-  setTimeout(()=>board.classList.add("show"),50);
+  board.classList.add("show");
 }
 </script>
 </body>
