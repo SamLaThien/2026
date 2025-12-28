@@ -1,151 +1,148 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Duck Racing — Stable Slow</title>
-
 <style>
-body{margin:0;background:#0f172a;color:#fff;font-family:Inter,system-ui;display:flex;justify-content:center}
-.container{max-width:960px;width:100%;padding:16px}
-.card{background:#111827;border-radius:16px;padding:16px;box-shadow:0 10px 28px rgba(0,0,0,.45);margin-bottom:14px}
-textarea{width:100%;min-height:90px;border-radius:12px;border:1px solid #334155;background:#020617;color:#fff;padding:12px}
-button{width:100%;padding:12px;border-radius:12px;border:none;margin-top:8px;font-weight:700;background:#22c55e;color:#000}
-.track{position:relative;margin-top:12px;background:#020617;border-radius:12px;border:1px solid #1e293b;padding:10px;overflow:hidden}
-.finish{position:absolute;right:6px;top:6px;bottom:6px;width:3px;background:#ef4444}
-.duck{display:flex;align-items:center;gap:8px;font-size:20px;margin:8px 0;position:relative;left:0}
-#board li{list-style:none;margin:6px 0;padding:8px;border-radius:10px;background:#020617}
-.top1{background:#fde047;color:#000}
-.top2{background:#e5e7eb;color:#000}
-.top3{background:#fb923c;color:#000}
-.timer{font-size:13px;opacity:.8;margin-top:6px}
+body{
+  font-family: Arial;
+  background:#0b1220;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* Track */
+.track{
+  width:95%;
+  max-width:900px;
+  border:2px solid #fff;
+  margin-top:10px;
+  position:relative;
+  height:70px;
+  border-radius:12px;
+  background:#1c2742;
+}
+
+/* Duck */
+.duck{
+  position:absolute;
+  left:5px;
+  top:18px;
+  font-size:30px;
+  transition:left .25s linear;
+}
+
+/* Buttons */
+.controls{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+button{
+  padding:10px 12px;
+  border-radius:10px;
+  border:none;
+}
+
+/* Leaderboard */
+.board{
+  width:95%;
+  max-width:900px;
+  background:#101b30;
+  margin-top:15px;
+  border-radius:12px;
+  padding:10px;
+}
+.board h3{margin:5px 0;}
+.rank-item{
+  padding:6px 10px;
+  border-bottom:1px solid #2b3a60;
+}
+.rank-item span{
+  font-weight:700;
+}
 </style>
 </head>
 
 <body>
-<div class="container">
-<div class="card">
 
-<h2 style="text-align:center">🦆 Duck Racing — Stable</h2>
-
-<p>Mỗi dòng 1 tên:</p>
-<textarea id="names"></textarea>
-<button id="startBtn">Bắt đầu đua</button>
-
-<div class="timer" id="timer"></div>
+<h2>🐥 Đua vịt – PC & Mobile</h2>
 
 <div class="track" id="track">
-  <div class="finish"></div>
+  <div class="duck" id="duck">🦆</div>
 </div>
 
-<h3>🏆 Bảng xếp hạng</h3>
-<ul id="board"></ul>
-
+<div class="controls">
+  <button onclick="move()">Đạp vịt</button>
+  <button onclick="resetGame()">Chơi lại</button>
 </div>
+
+<div class="board">
+  <h3>🏆 Bảng Xếp Hạng</h3>
+  <div id="leaderboard"></div>
 </div>
 
 <script>
-const btn=document.getElementById("startBtn");
-const track=document.getElementById("track");
-const board=document.getElementById("board");
-const timerEl=document.getElementById("timer");
+let duck = document.getElementById("duck");
+let track = document.getElementById("track");
+let pos = 5;
+let finished = false;
 
-let ducks=[], results=[], running=false, startTime=0, timerLoop=null, finishX=0;
+let leaderboard = [];
 
-function reset(){
-  running=false;
-  results=[];
-  board.innerHTML="";
-  timerEl.textContent="";
-  clearInterval(timerLoop);
+// --- Move Duck ---
+function move(){
+  if(finished) return;
+
+  pos += 20;                     // tốc độ ổn định
+  duck.style.left = pos + "px";
+
+  let limit = track.clientWidth - 60;
+
+  if(pos >= limit){
+    finished = true;
+    let time = Date.now();
+    addToBoard(time);
+  }
 }
 
-function startRace(){
-  reset();
-
-  const names=document.getElementById("names").value
-    .split("\n").map(s=>s.trim()).filter(Boolean);
-
-  if(!names.length){alert("Nhập tên trước!");return;}
-
-  track.querySelectorAll(".duck").forEach(e=>e.remove());
-
-  // chiều rộng track thực tế
-  const trackWidth=track.clientWidth;
-  finishX=trackWidth-70;  // trừ kích thước icon vịt
-
-  ducks=names.map(name=>{
-    const d=document.createElement("div");
-    d.className="duck";
-    d.dataset.x=0;
-    d.dataset.name=name;
-    d.dataset.done="0";
-    d.innerHTML=`<span>🦆</span><span>${name}</span>`;
-    track.appendChild(d);
-    return d;
+// --- Add & Render Leaderboard ---
+function addToBoard(time){
+  leaderboard.push({
+    name:"Người chơi",
+    score: time
   });
 
-  running=true;
-  startTime=performance.now();
+  leaderboard.sort((a,b)=>a.score - b.score); // thời gian nhỏ hơn = thắng
 
-  timerLoop=setInterval(()=>{
-    const t=((performance.now()-startTime)/1000).toFixed(2);
-    timerEl.textContent="⏱ "+t+"s";
-  },200);
-
-  requestAnimationFrame(loop);
+  renderBoard();
 }
 
-function loop(){
-  if(!running) return;
+function renderBoard(){
+  let box = document.getElementById("leaderboard");
+  box.innerHTML = "";
 
-  ducks.forEach(d=>{
-    if(d.dataset.done==="1") return;
+  if(leaderboard.length === 0){
+    box.innerHTML = "<i>Chưa có người chơi</i>";
+    return;
+  }
 
-    let x=+d.dataset.x;
-
-    // 🐌 tốc độ chậm rõ ràng
-    x+=1.2 + Math.random()*1.0;
-
-    if(x>=finishX){
-      x=finishX;
-      d.dataset.done="1";
-
-      const t=(performance.now()-startTime)/1000;
-      results.push({name:d.dataset.name,time:t});
-
-      d.style.left=x+"px";
-      updateRanking();
-
-      if(results.length===ducks.length){
-        running=false;
-        clearInterval(timerLoop);
-      }
-      return;
-    }
-
-    d.dataset.x=x;
-    d.style.left=x+"px";
-  });
-
-  requestAnimationFrame(loop);
-}
-
-function updateRanking(){
-  results.sort((a,b)=>a.time-b.time);
-  board.innerHTML="";
-
-  results.forEach((r,i)=>{
-    const li=document.createElement("li");
-    li.textContent=`${i+1}. ${r.name} — ${r.time.toFixed(2)}s`;
-    if(i===0) li.classList.add("top1");
-    if(i===1) li.classList.add("top2");
-    if(i===2) li.classList.add("top3");
-    board.appendChild(li);
+  leaderboard.forEach((p,i)=>{
+    let item = document.createElement("div");
+    item.className="rank-item";
+    item.innerHTML = `<span>TOP ${i+1}</span> — ${p.name}`;
+    box.appendChild(item);
   });
 }
 
-btn.onclick=()=>{ if(!running) startRace(); };
+// --- Reset ---
+function resetGame(){
+  pos = 5;
+  finished = false;
+  duck.style.left = pos + "px";
+}
 </script>
+
 </body>
 </html>
