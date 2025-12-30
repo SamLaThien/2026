@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Duck Racing — Short Boost</title>
+<title>Cuộc Đua Muôn Loài — Multi-Species Race</title>
 
 <style>
 body{margin:0;background:#0f172a;color:#fff;font-family:system-ui;display:flex;justify-content:center;min-height:100vh}
 .container{max-width:1000px;width:100%;padding:10px;display:flex;flex-direction:column;box-sizing:border-box}
 .card{background:#111827;border-radius:16px;padding:15px;box-shadow:0 10px 25px rgba(0,0,0,.5);border:1px solid #1f2937}
 
-h2{text-align:center;color:#38bdf8;margin:5px 0}
+h2{text-align:center;color:#38bdf8;margin:5px 0; text-transform: uppercase; letter-spacing: 1px;}
 textarea{width:100%;height:60px;border-radius:8px;border:1px solid #334155;background:#020617;color:#fff;padding:10px;box-sizing:border-box;font-size: 14px;}
 
 .buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer;transition: 0.2s;}
+button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer;transition: 0.2s; text-transform: uppercase;}
 #startBtn{background:#22c55e;color:#000}
 #resetBtn{background:#38bdf8;color:#000}
 
-.timer{font-size:22px;text-align:center;color:#fbbf24;font-weight:bold;margin-bottom:10px;}
+.timer{font-size:22px;text-align:center;color:#fbbf24;font-weight:bold;margin-bottom:10px; font-family: monospace;}
 .commentary-box{background:#1e1b4b;color:#e0e7ff;padding:10px;border-radius:8px;font-size:14px;border:1px solid #4338ca;min-height:22px;margin-bottom:15px; text-align: center;}
 
 /* ĐƯỜNG ĐUA */
@@ -34,22 +34,22 @@ button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer
 .track {
   position:relative;
   width: 4000px;
-  background-image: linear-gradient(90deg, rgba(56,189,248,0.1) 1px, transparent 1px);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 200px 100%;
   padding: 10px 0;
   transition: height 0.3s ease;
 }
 .finish-line {
   position:absolute;
-  right:100px;
+  right:120px;
   top:0; bottom:0;
   width:20px;
   background: repeating-linear-gradient(45deg, #ef4444, #ef4444 8px, #fff 8px, #fff 16px);
   border-left: 4px solid white;
 }
 
-/* CON VỊT */
-.duck {
+/* CON VẬT */
+.racer {
   position: absolute;
   left: 0;
   display: flex;
@@ -59,18 +59,21 @@ button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer
   height: 40px;
   padding: 0 10px;
   z-index: 2;
+  white-space: nowrap;
 }
-.duck-icon {
-  font-size: 26px;
+.racer-icon {
+  font-size: 28px;
+  display: inline-block;
   transition: transform 0.2s;
 }
 
-/* HIỆU ỨNG NHÌN RÕ KHI BỨT TỐC NHẸ */
-.duck.boosted .duck-icon {
-  filter: drop-shadow(0 0 10px #fbbf24);
-  transform: scale(1.2) skewX(-10deg);
+/* HIỆU ỨNG BỨT TỐC NHẸ */
+.racer.boosted .racer-icon {
+  filter: drop-shadow(0 0 12px #fbbf24);
+  transform: scale(1.3) skewX(-15deg);
 }
-.duck.stunned { opacity: 0.4; filter: grayscale(1); }
+.racer.stunned { opacity: 0.4; filter: grayscale(1); }
+.racer.stunned .racer-icon { transform: rotate(180deg); }
 
 /* BẢNG XẾP HẠNG */
 #board { padding:0; list-style:none; }
@@ -79,23 +82,23 @@ button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer
   border-radius:8px; display:flex; justify-content:space-between;
   border: 1px solid #334155;
 }
-.top1 { background: #fde047 !important; color: #000; font-weight: bold; }
+.top1 { background: linear-gradient(90deg, #fde047, #facc15) !important; color: #000; font-weight: bold; }
 </style>
 </head>
 
 <body>
 <div class="container">
   <div class="card">
-    <h2>🐤 Duck Racing — Short Boost</h2>
-    <textarea id="names" placeholder="Vịt 1&#10;Vịt 2...">Vịt Vàng&#10;Vịt Xanh&#10;Vịt Đỏ&#10;Vịt Tím&#10;Vịt Cam</textarea>
+    <h2>🏆 Cuộc Đua Muôn Loài</h2>
+    <textarea id="names" placeholder="Nhập tên vận động viên (mỗi dòng 1 tên)...">Sư Tử&#10;Hổ Báo&#10;Thỏ Trắng&#10;Rùa Xanh&#10;Sói Xám&#10;Khỉ Con</textarea>
     
     <div class="buttons">
-      <button id="startBtn">🏁 BẮT ĐẦU</button>
+      <button id="startBtn">🚀 BẮT ĐẦU ĐUA</button>
       <button id="resetBtn">🔄 LÀM MỚI</button>
     </div>
 
-    <div class="timer" id="timer">⏱ 0.00s</div>
-    <div class="commentary-box" id="commentary">📢 Sẵn sàng!</div>
+    <div class="timer" id="timer">00.00s</div>
+    <div class="commentary-box" id="commentary">📢 Đang chờ các vận động viên vào vạch xuất phát...</div>
 
     <div class="track-wrapper" id="scrollContainer">
       <div class="track" id="track">
@@ -103,7 +106,7 @@ button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer
       </div>
     </div>
 
-    <h3>🏆 Kết quả</h3>
+    <h3>📊 Bảng Tổng Sắp</h3>
     <ul id="board"></ul>
   </div>
 </div>
@@ -115,7 +118,15 @@ const commentaryEl = document.getElementById('commentary');
 const board = document.getElementById('board');
 const timerEl = document.getElementById('timer');
 
-let ducks = [], results = [], running = false, startTime = 0;
+// Danh sách icon muôn loài
+const speciesIcons = [
+    '🦁', '🐯', '🐺', '🦊', '🐱', '🦁', '🦓', '🦄', '🐴', '🐄', 
+    '🐷', '🐭', '🐰', '🐹', '🐿️', '🐻', '🐼', '🐨', '🐸', '🐵', 
+    '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🐢', '🐍', '🐙', 
+    '🐬', '🐘', '🦒', '🐆', '🐫'
+];
+
+let racers = [], results = [], running = false, startTime = 0;
 let msgQueue = [], isAnnouncing = false;
 
 function log(msg) {
@@ -131,10 +142,10 @@ function showNextMsg() {
 }
 
 function reset() {
-    running = false; results = []; board.innerHTML = ""; timerEl.textContent = "⏱ 0.00s";
+    running = false; results = []; board.innerHTML = ""; timerEl.textContent = "00.00s";
     msgQueue = []; isAnnouncing = false; commentaryEl.textContent = "📢 Sẵn sàng!";
     scrollContainer.scrollLeft = 0;
-    track.querySelectorAll('.duck').forEach(d => d.remove());
+    track.querySelectorAll('.racer').forEach(r => r.remove());
 }
 
 function startRace() {
@@ -143,22 +154,28 @@ function startRace() {
     if(names.length === 0) return;
     reset();
 
-    const duckHeight = 45;
-    track.style.height = (names.length * duckHeight + 20) + "px";
+    const laneHeight = 45;
+    track.style.height = (names.length * laneHeight + 20) + "px";
 
-    ducks = names.map((name, i) => {
-        const d = document.createElement('div');
-        d.className = 'duck';
-        d.innerHTML = `<span class="duck-icon">🦆</span> <span>${name}</span>`;
-        d.style.top = (i * duckHeight + 10) + "px";
-        d.dataset.x = 0;
-        d.dataset.name = name;
-        d.dataset.status = "run";
-        d.dataset.statusTimer = 0;
-        d.dataset.cooldown = 0;
-        d.dataset.done = "0";
-        track.appendChild(d);
-        return d;
+    // Trộn ngẫu nhiên icon
+    const shuffledIcons = [...speciesIcons].sort(() => Math.random() - 0.5);
+
+    racers = names.map((name, i) => {
+        const r = document.createElement('div');
+        r.className = 'racer';
+        const icon = shuffledIcons[i % shuffledIcons.length];
+        
+        r.innerHTML = `<span class="racer-icon">${icon}</span> <span>${name}</span>`;
+        r.style.top = (i * laneHeight + 10) + "px";
+        r.dataset.x = 0;
+        r.dataset.name = name;
+        r.dataset.icon = icon;
+        r.dataset.status = "run";
+        r.dataset.statusTimer = 0;
+        r.dataset.cooldown = 0;
+        r.dataset.done = "0";
+        track.appendChild(r);
+        return r;
     });
 
     running = true;
@@ -170,75 +187,80 @@ function update() {
     if(!running) return;
     const now = performance.now();
     const elapsed = ((now - startTime) / 1000).toFixed(2);
-    timerEl.textContent = "⏱ " + elapsed + "s";
+    timerEl.textContent = elapsed + "s";
 
     let leadingX = 0;
     let finishedCount = 0;
-    const finishX = track.offsetWidth - 130;
+    const finishLineX = track.offsetWidth - 150;
 
-    ducks.forEach(d => {
-        if(d.dataset.done === "1") { finishedCount++; return; }
+    racers.forEach(r => {
+        if(r.dataset.done === "1") { finishedCount++; return; }
 
-        let x = parseFloat(d.dataset.x);
-        let sTimer = parseInt(d.dataset.statusTimer);
-        let cooldown = parseInt(d.dataset.cooldown);
+        let x = parseFloat(r.dataset.x);
+        let sTimer = parseInt(r.dataset.statusTimer);
+        let cooldown = parseInt(r.dataset.cooldown);
 
-        if(sTimer > 0) d.dataset.statusTimer = sTimer - 1;
-        if(cooldown > 0) d.dataset.cooldown = cooldown - 1;
+        if(sTimer > 0) r.dataset.statusTimer = sTimer - 1;
+        if(cooldown > 0) r.dataset.cooldown = cooldown - 1;
 
-        if(sTimer === 0 && d.dataset.status !== "run") {
-            d.dataset.status = "run";
-            d.classList.remove('boosted', 'stunned');
+        if(sTimer === 0 && r.dataset.status !== "run") {
+            r.dataset.status = "run";
+            r.classList.remove('boosted', 'stunned');
         }
 
-        // --- ĐIỀU CHỈNH TỐC ĐỘ ---
-        let speed = 1.8 + Math.random() * 1.2; 
-        if(d.dataset.status === "boost") speed += 2.5; // Giảm từ 6 xuống 2.5 để bứt tốc ngắn
-        if(d.dataset.status === "stun") speed = 0;
+        // Tốc độ di chuyển cơ bản
+        let speed = 2.0 + Math.random() * 1.5; 
+        if(r.dataset.status === "boost") speed += 2.8; // Bứt tốc ngắn nhẹ nhàng
+        if(r.dataset.status === "stun") speed = 0;
 
-        // --- LOGIC BỨT TỐC NGẮN ---
-        if(d.dataset.status === "run" && parseInt(d.dataset.cooldown) === 0 && Math.random() < 0.008) {
+        // Sự kiện bứt tốc hoặc vấp ngã
+        if(r.dataset.status === "run" && parseInt(r.dataset.cooldown) === 0 && Math.random() < 0.007) {
             if(Math.random() > 0.4) {
-                d.dataset.status = "boost";
-                d.dataset.statusTimer = 40; // Rút ngắn thời gian boost còn ~0.7 giây
-                d.dataset.cooldown = 300;   // Hồi chiêu 5 giây
-                d.classList.add('boosted');
-                log(d.dataset.name + " nhích nhẹ lên!");
+                r.dataset.status = "boost";
+                r.dataset.statusTimer = 45; // ~0.75 giây
+                r.dataset.cooldown = 350;    // Nghỉ 6 giây
+                r.classList.add('boosted');
+                log(r.dataset.icon + " " + r.dataset.name + " đang tăng tốc!");
             } else {
-                d.dataset.status = "stun";
-                d.dataset.statusTimer = 40; 
-                d.dataset.cooldown = 150;
-                d.classList.add('stunned');
-                log(d.dataset.name + " bị khựng lại!");
+                r.dataset.status = "stun";
+                r.dataset.statusTimer = 40; 
+                r.dataset.cooldown = 150;
+                r.classList.add('stunned');
+                log(r.dataset.icon + " " + r.dataset.name + " bị khựng lại một nhịp!");
             }
         }
 
         x += speed;
-        d.dataset.x = x;
-        d.style.left = x + "px";
+        r.dataset.x = x;
+        r.style.left = x + "px";
         if(x > leadingX) leadingX = x;
 
-        if(x >= finishX) {
-            d.dataset.done = "1";
-            d.style.left = finishX + "px";
-            results.push({name: d.dataset.name, time: elapsed});
-            log(d.dataset.name + " VỀ ĐÍCH!");
+        // Về đích
+        if(x >= finishLineX) {
+            r.dataset.done = "1";
+            r.style.left = finishLineX + "px";
+            results.push({name: r.dataset.name, icon: r.dataset.icon, time: elapsed});
+            log("Về đích: " + r.dataset.icon + " " + r.dataset.name + "!");
             updateBoard();
         }
     });
 
+    // Cuộn camera theo con dẫn đầu
     const screenW = scrollContainer.offsetWidth;
-    if(leadingX > screenW / 3) {
-        scrollContainer.scrollLeft = leadingX - screenW / 3;
+    if(leadingX > screenW / 2.5) {
+        scrollContainer.scrollLeft = leadingX - screenW / 2.5;
     }
 
-    if(finishedCount < ducks.length) requestAnimationFrame(update);
+    if(finishedCount < racers.length) requestAnimationFrame(update);
     else running = false;
 }
 
 function updateBoard() {
     board.innerHTML = results.map((r, i) => 
-        `<li class="${i===0?'top1':''}"><span>#${i+1} ${r.name}</span> <span>${r.time}s</span></li>`
+        `<li class="${i===0?'top1':''}">
+            <span><b>#${i+1}</b> ${r.icon} ${r.name}</span> 
+            <span>${r.time}s</span>
+        </li>`
     ).join('');
 }
 
