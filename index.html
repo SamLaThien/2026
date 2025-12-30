@@ -3,121 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Duck Racing — Smooth Boost</title>
+<title>Duck Racing — Final Smooth</title>
 
 <style>
-/* --- Cấu trúc cơ bản --- */
-body{margin:0;background:#0f172a;color:#fff;font-family:Inter,system-ui;display:flex;justify-content:center;min-height:100vh}
-.container{max-width:100%;width:100%;padding:16px;display:flex;flex-direction:column; box-sizing: border-box;}
-.card{background:#111827;border-radius:16px;padding:20px;box-shadow:0 10px 28px rgba(0,0,0,.5);margin-bottom:14px;border:1px solid #1f2937}
+body{margin:0;background:#0f172a;color:#fff;font-family:system-ui;display:flex;justify-content:center;min-height:100vh;overflow-x:hidden}
+.container{max-width:100%;width:100%;padding:10px;display:flex;flex-direction:column;box-sizing:border-box}
+.card{background:#111827;border-radius:16px;padding:15px;box-shadow:0 10px 25px rgba(0,0,0,.5);border:1px solid #1f2937}
 
-h2 {margin-top:0; color:#38bdf8; text-shadow: 0 0 10px rgba(56,189,248,0.3);}
-p {margin-bottom: 6px; font-size: 0.9em; color: #94a3b8;}
-textarea{width:100%;min-height:100px;border-radius:12px;border:1px solid #334155;background:#020617;color:#e2e8f0;padding:12px;font-family:monospace;resize:vertical;box-sizing:border-box;}
-textarea:focus{outline:2px solid #38bdf8;border-color:transparent}
+h2{text-align:center;color:#38bdf8;margin:10px 0}
+textarea{width:100%;height:80px;border-radius:8px;border:1px solid #334155;background:#020617;color:#fff;padding:10px;box-sizing:border-box}
 
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-button{width:100%;padding:14px;border-radius:12px;border:none;font-weight:700;font-size:16px;cursor:pointer;transition:transform 0.1s}
-button:active{transform:scale(0.98)}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+button{padding:12px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
 #startBtn{background:#22c55e;color:#000}
-#startBtn:hover{background:#16a34a}
-.reset{background:#38bdf8;color:#000}
+#resetBtn{background:#38bdf8;color:#000}
 
-/* --- Khung bình luận --- */
-.commentary-box {
-    background: #1e1b4b;
-    color: #e0e7ff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-top: 10px;
-    font-size: 15px;
-    border: 1px solid #4338ca;
-    min-height: 24px;
-    display: flex; align-items: center;
-    transition: all 0.3s;
-}
-.commentary-box.active { border-color: #818cf8; box-shadow: 0 0 10px rgba(129,140,248,0.4); }
+.timer{font-size:20px;text-align:center;color:#fbbf24;font-weight:bold;margin-bottom:10px}
+.commentary-box{background:#1e1b4b;color:#e0e7ff;padding:10px;border-radius:8px;font-size:14px;border:1px solid #4338ca;min-height:20px;margin-bottom:10px}
 
-/* --- Đường đua --- */
-.timer{font-size:24px;font-weight:bold;text-align:center;margin:10px 0;color:#fbbf24}
-
-.track-scroll-wrapper {
+/* Đường đua */
+.track-wrapper {
   width: 100%;
   overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid #1e293b;
   background:#020617;
-  margin-top:12px;
-  scroll-behavior: smooth;
+  border:1px solid #1e293b;
+  border-radius:8px;
+  position: relative;
 }
-
 .track {
   position:relative;
-  width: 5000px;
-  padding:15px 10px;
-  overflow:hidden;
-  min-height:60px;
+  width: 4000px; /* Độ dài cố định */
+  min-height: 100px;
+  padding: 10px 0;
   background-image: linear-gradient(90deg, #1e293b 1px, transparent 1px);
-  background-size: 200px 100%; /* Vạch kẻ mỗi 200px */
+  background-size: 200px 100%;
+}
+.finish-line {
+  position:absolute;
+  right:50px;
+  top:0; bottom:0;
+  width:15px;
+  background: repeating-linear-gradient(45deg, #ef4444, #ef4444 8px, #fff 8px, #fff 16px);
+  border-left: 2px solid white;
 }
 
-.finish{position:absolute;right:10px;top:0;bottom:0;width:12px;background:repeating-linear-gradient(45deg, #ef4444, #ef4444 10px, #fff 10px, #fff 20px);z-index:1;}
-
-/* --- Con vịt --- */
-.duck{
-  display:flex;align-items:center;gap:8px;
-  font-size:18px; font-weight: 600;
-  margin:15px 0;
-  position:relative;
-  left:0;
-  white-space:nowrap;
-  z-index:2;
-  transition: transform 0.3s ease-out; /* Mượt mà hơn */
+/* Con vịt */
+.duck {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  white-space: nowrap;
+  transition: top 0.3s;
+  z-index: 2;
 }
-.duck span:first-child {font-size: 28px; display: inline-block;}
-
-/* Hiệu ứng TRỰC QUAN để nhìn rõ bứt tốc */
-.duck.boosted {
-    filter: drop-shadow(0 0 8px #fbbf24);
+.duck-icon {
+  font-size: 24px;
+  display: inline-block;
 }
-.duck.boosted span:first-child {
-    transform: scale(1.3) skewX(-10deg); /* Nghiêng người về phía trước */
-    animation: fire 0.2s infinite alternate;
+
+/* Hiệu ứng */
+.duck.boosted .duck-icon {
+  filter: drop-shadow(0 0 8px orange);
+  transform: scale(1.2);
 }
-@keyframes fire { from{filter: brightness(1);} to{filter: brightness(1.5) contrast(1.2);} }
+.duck.stunned { opacity: 0.5; filter: grayscale(1); }
 
-.duck.stunned { opacity: 0.4; filter: grayscale(100%) blur(1px); }
-.duck.fury { color: #f87171; text-shadow: 0 0 5px red; }
-
-/* --- Bảng xếp hạng --- */
-#board {padding:0; margin-top: 10px;}
-#board li{
-  list-style:none; margin:8px 0; padding:12px; border-radius:10px; background:#1e293b; display:flex; justify-content:space-between; border: 1px solid #334155;
+/* Xếp hạng */
+#board { padding:0; list-style:none; }
+#board li {
+  background:#1e293b; padding:10px; margin-bottom:5px;
+  border-radius:6px; display:flex; justify-content:space-between;
 }
-#board li.top1{background:#fde047;color:#000;}
-
-@keyframes popIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+.top1 { background: #fde047 !important; color: #000; }
 </style>
 </head>
 
 <body>
 <div class="container">
   <div class="card">
-    <h2 style="text-align:center">🐤 Duck Racing — Smooth Mode</h2>
-    <textarea id="names" placeholder="Nhập tên vịt..."></textarea>
-
+    <h2>🐤 Siêu Đua Vịt</h2>
+    <textarea id="names" placeholder="Nhập mỗi tên 1 dòng...">Vịt Vàng&#10;Vịt Xanh&#10;Vịt Đỏ</textarea>
+    
     <div class="buttons">
-      <button id="startBtn">🏁 Đua ngay</button>
-      <button id="resetBtn" class="reset">🔄 Làm mới</button>
+      <button id="startBtn">🏁 BẮT ĐẦU</button>
+      <button id="resetBtn">🔄 LÀM MỚI</button>
     </div>
 
     <div class="timer" id="timer">0.00s</div>
-    <div class="commentary-box" id="commentary">📢 Sẵn sàng...</div>
+    <div class="commentary-box" id="commentary">📢 Sẵn sàng đua!</div>
 
-    <div class="track-scroll-wrapper" id="scrollContainer">
-        <div class="track" id="track">
-          <div class="finish"></div>
-        </div>
+    <div class="track-wrapper" id="scrollContainer">
+      <div class="track" id="track">
+        <div class="finish-line"></div>
+      </div>
     </div>
 
     <h3>🏆 Bảng xếp hạng</h3>
@@ -126,168 +107,150 @@ button:active{transform:scale(0.98)}
 </div>
 
 <script>
-const btn = document.getElementById("startBtn");
-const resetBtn = document.getElementById("resetBtn");
-const track = document.getElementById("track");
-const scrollContainer = document.getElementById("scrollContainer");
-const board = document.getElementById("board");
-const timerEl = document.getElementById("timer");
-const commentaryEl = document.getElementById("commentary");
+const track = document.getElementById('track');
+const scrollContainer = document.getElementById('scrollContainer');
+const commentaryEl = document.getElementById('commentary');
+const board = document.getElementById('board');
+const timerEl = document.getElementById('timer');
 
-let ducks = [], results = [], running = false, startTime = 0, timerLoop = null, finishX = 0;
-let msgQueue = [];
-let isAnnouncing = false;
+let ducks = [], results = [], running = false, startTime = 0;
+let msgQueue = [], isAnnouncing = false;
 
-function log(msg, important = false) {
-    if(important) msgQueue.unshift(msg);
-    else msgQueue.push(msg);
-    processQueue();
+function log(msg) {
+    msgQueue.push(msg);
+    if(!isAnnouncing) showNextMsg();
 }
 
-function processQueue() {
-    if(isAnnouncing || msgQueue.length === 0) return;
+function showNextMsg() {
+    if(msgQueue.length === 0) { isAnnouncing = false; return; }
     isAnnouncing = true;
-    const msg = msgQueue.shift();
-    commentaryEl.innerHTML = `📢 ${msg}`;
-    commentaryEl.classList.add("active");
-    setTimeout(() => {
-        commentaryEl.classList.remove("active");
-        isAnnouncing = false;
-        processQueue();
-    }, 1800); // Tăng thời gian đọc lên 1.8s
+    commentaryEl.textContent = "📢 " + msgQueue.shift();
+    setTimeout(() => showNextMsg(), 1500);
 }
 
-function reset(){
-  running = false; results = []; board.innerHTML = ""; timerEl.textContent = "0.00s";
-  msgQueue = []; isAnnouncing = false; commentaryEl.textContent = "📢 Sẵn sàng...";
-  clearInterval(timerLoop);
-  scrollContainer.scrollLeft = 0;
-  track.innerHTML = '<div class="finish"></div>';
+function reset() {
+    running = false;
+    results = [];
+    board.innerHTML = "";
+    timerEl.textContent = "0.00s";
+    msgQueue = [];
+    scrollContainer.scrollLeft = 0;
+    // Xóa vịt cũ nhưng giữ lại vạch đích
+    track.querySelectorAll('.duck').forEach(d => d.remove());
 }
 
-function startRace(){
-  if(running) return;
-  const names = document.getElementById("names").value.split("\n").map(s => s.trim()).filter(Boolean);
-  if(!names.length) return;
-  reset(); 
-  finishX = track.offsetWidth - 120; 
-
-  ducks = names.map((name) => {
-    const d = document.createElement("div");
-    d.className = "duck";
-    d.dataset.x = 0;
-    d.dataset.name = name;
-    d.dataset.done = "0";
-    d.dataset.status = "run";
-    d.dataset.lockTime = 0;
-    d.dataset.speed = 2 + Math.random() * 1; // Tốc độ cơ sở
-    d.innerHTML = `<span>🦆</span><span>${name}</span>`;
-    track.appendChild(d);
-    return d;
-  });
-
-  running = true;
-  startTime = performance.now();
-  timerLoop = setInterval(() => {
-    const t = ((performance.now() - startTime) / 1000).toFixed(2);
-    timerEl.textContent = "⏱ " + t + "s";
-  }, 50);
-  requestAnimationFrame(loop);
-}
-
-function loop(){
-  if(!running) return;
-  let finishedCount = 0;
-  let leadingX = 0; 
-  ducks.forEach(d => { if(d.dataset.done === "0" && parseFloat(d.dataset.x) > leadingX) leadingX = parseFloat(d.dataset.x); });
-
-  ducks.forEach(d => {
-    if(d.dataset.done === "1") { finishedCount++; return; }
-
-    let x = parseFloat(d.dataset.x);
-    let name = d.dataset.name;
-    let lockTime = parseInt(d.dataset.lockTime);
-    let status = d.dataset.status;
-
-    // QUẢN LÝ TRẠNG THÁI
-    if(lockTime > 0) {
-        d.dataset.lockTime = lockTime - 1;
-        if(status === "sleep") return; 
-    } else if(status !== "run") {
-        d.className = "duck";
-        d.dataset.status = "run";
-    }
-
-    // TÍNH TOÁN TỐC ĐỘ (ĐÃ LÀM CHẬM LẠI ĐỂ DỄ NHÌN)
-    let currentSpeed = parseFloat(d.dataset.speed) + (Math.random() * 0.5);
-
-    if(status === "boost") {
-        currentSpeed += 6; // Giảm từ 15 xuống 6 để bứt tốc mượt mà
-    }
+function startRace() {
+    if(running) return;
+    const names = document.getElementById('names').value.split('\n').map(s => s.trim()).filter(Boolean);
+    if(names.length === 0) return;
     
-    // Fury Mode (Lội ngược dòng)
-    if(status === "run" && (leadingX - x > 800)) {
-        d.classList.add("fury");
-        currentSpeed += 3.5; 
-    }
+    reset();
+    const trackWidth = track.offsetWidth;
+    const finishX = trackWidth - 80;
 
-    // RANDOM EVENTS (Tỉ lệ cực thấp để tin nhắn không bị chồng chéo)
-    if(status === "run" && Math.random() < 0.003) {
-        if(Math.random() < 0.5) {
-            d.dataset.status = "sleep";
-            d.dataset.lockTime = 100;
-            d.classList.add("stunned");
-            log(`${name} đang dừng lại... thở dốc!`);
-        } else {
-            d.dataset.status = "boost";
-            d.dataset.lockTime = 120; // Kéo dài thời gian boost lên để nhìn cho rõ
-            d.classList.add("boosted");
-            log(`${name} BẮT ĐẦU TĂNG TỐC!`);
+    ducks = names.map((name, i) => {
+        const d = document.createElement('div');
+        d.className = 'duck';
+        d.innerHTML = `<span class="duck-icon">🦆</span> <span>${name}</span>`;
+        d.style.top = (i * 40 + 10) + "px";
+        d.dataset.x = 0;
+        d.dataset.name = name;
+        d.dataset.status = "run";
+        d.dataset.timer = 0;
+        track.appendChild(d);
+        return d;
+    });
+
+    running = true;
+    startTime = performance.now();
+    requestAnimationFrame(update);
+}
+
+function update() {
+    if(!running) return;
+
+    const now = performance.now();
+    const elapsed = ((now - startTime) / 1000).toFixed(2);
+    timerEl.textContent = elapsed + "s";
+
+    let leadingX = 0;
+    let finishedCount = 0;
+    const finishX = track.offsetWidth - 80;
+
+    ducks.forEach(d => {
+        if(d.dataset.done === "1") {
+            finishedCount++;
+            return;
         }
+
+        let x = parseFloat(d.dataset.x);
+        let status = d.dataset.status;
+        let timer = parseInt(d.dataset.timer);
+
+        // Logic trạng thái
+        if(timer > 0) {
+            d.dataset.timer = timer - 1;
+        } else {
+            d.dataset.status = "run";
+            d.classList.remove('boosted', 'stunned');
+        }
+
+        // Tốc độ
+        let speed = 1.5 + Math.random() * 1.5;
+        if(status === "boost") speed += 5;
+        if(status === "stun") speed = 0;
+
+        // Sự kiện ngẫu nhiên
+        if(status === "run" && Math.random() < 0.005) {
+            if(Math.random() > 0.5) {
+                d.dataset.status = "boost";
+                d.dataset.timer = 100;
+                d.classList.add('boosted');
+                log(d.dataset.name + " đang bứt tốc mạnh mẽ!");
+            } else {
+                d.dataset.status = "stun";
+                d.dataset.timer = 60;
+                d.classList.add('stunned');
+                log(d.dataset.name + " vừa bị vấp ngã!");
+            }
+        }
+
+        x += speed;
+        d.dataset.x = x;
+        d.style.left = x + "px";
+
+        if(x > leadingX) leadingX = x;
+
+        // Về đích
+        if(x >= finishX) {
+            d.dataset.done = "1";
+            results.push({name: d.dataset.name, time: elapsed});
+            log("Chúc mừng " + d.dataset.name + " đã về đích!");
+            updateBoard();
+        }
+    });
+
+    // Cuộn camera mượt mà
+    const screenW = scrollContainer.offsetWidth;
+    if(leadingX > screenW / 2) {
+        scrollContainer.scrollLeft = leadingX - screenW / 2;
     }
 
-    x += currentSpeed;
-
-    if(x >= finishX){
-      x = finishX;
-      d.dataset.done = "1";
-      d.className = "duck";
-      const t = (performance.now() - startTime) / 1000;
-      results.push({ name: name, time: t });
-      log(`Cán đích: ${name}!`, true);
-      updateRanking();
+    if(finishedCount < ducks.length) {
+        requestAnimationFrame(update);
+    } else {
+        running = false;
     }
-
-    d.dataset.x = x;
-    d.style.left = x + "px";
-  });
-
-  // CAMERA (LÀM MƯỢT CUỘN)
-  const centerOffset = scrollContainer.clientWidth / 3;
-  if(leadingX > centerOffset) {
-      scrollContainer.scrollLeft = leadingX - centerOffset;
-  }
-
-  if(finishedCount === ducks.length && ducks.length > 0){
-    running = false; clearInterval(timerLoop);
-  } else {
-    requestAnimationFrame(loop);
-  }
 }
 
-function updateRanking(){
-  results.sort((a,b) => a.time - b.time);
-  board.innerHTML = ""; 
-  results.forEach((r, i) => {
-    const li = document.createElement("li");
-    li.innerHTML = `<span>#${i+1} ${r.name}</span><span>${r.time.toFixed(2)}s</span>`;
-    if(i === 0) li.classList.add("top1");
-    board.appendChild(li);
-  });
+function updateBoard() {
+    board.innerHTML = results.map((r, i) => 
+        `<li class="${i===0?'top1':''}"><span>#${i+1} ${r.name}</span> <span>${r.time}s</span></li>`
+    ).join('');
 }
 
-btn.onclick = startRace;
-resetBtn.onclick = reset;
+document.getElementById('startBtn').onclick = startRace;
+document.getElementById('resetBtn').onclick = reset;
 </script>
 </body>
 </html>
