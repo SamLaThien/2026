@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Duck Racing — Chaos Edition</title>
+<title>Duck Racing — Smooth Boost</title>
 
 <style>
 /* --- Cấu trúc cơ bản --- */
@@ -22,27 +22,24 @@ button:active{transform:scale(0.98)}
 #startBtn{background:#22c55e;color:#000}
 #startBtn:hover{background:#16a34a}
 .reset{background:#38bdf8;color:#000}
-.reset:hover{background:#0ea5e9}
 
-/* --- Khu vực thông báo (Mới) --- */
+/* --- Khung bình luận --- */
 .commentary-box {
-    background: #431407;
-    color: #fdba74;
-    padding: 8px 12px;
+    background: #1e1b4b;
+    color: #e0e7ff;
+    padding: 12px 16px;
     border-radius: 8px;
     margin-top: 10px;
-    font-size: 14px;
-    font-family: monospace;
-    border: 1px solid #ea580c;
+    font-size: 15px;
+    border: 1px solid #4338ca;
     min-height: 24px;
     display: flex; align-items: center;
-    overflow: hidden;
+    transition: all 0.3s;
 }
-.blink-text { animation: blink 0.5s infinite alternate; font-weight: bold; color: #fff;}
-@keyframes blink { from{opacity:1} to{opacity:0.5} }
+.commentary-box.active { border-color: #818cf8; box-shadow: 0 0 10px rgba(129,140,248,0.4); }
 
 /* --- Đường đua --- */
-.timer{font-size:24px;font-weight:bold;text-align:center;margin:10px 0;font-variant-numeric:tabular-nums;color:#fbbf24}
+.timer{font-size:24px;font-weight:bold;text-align:center;margin:10px 0;color:#fbbf24}
 
 .track-scroll-wrapper {
   width: 100%;
@@ -51,62 +48,53 @@ button:active{transform:scale(0.98)}
   border: 1px solid #1e293b;
   background:#020617;
   margin-top:12px;
+  scroll-behavior: smooth;
 }
 
 .track {
   position:relative;
-  width: 5000px; /* Đua đường dài 5000px */
-  padding:10px 10px 10px 0;
+  width: 5000px;
+  padding:15px 10px;
   overflow:hidden;
-  min-height:50px;
-  background-image: repeating-linear-gradient(90deg, transparent 0, transparent 499px, #334155 500px);
-}
-/* Số mét trên đường đua */
-.track::after {
-    content: "500m 1000m 1500m 2000m 2500m 3000m 3500m 4000m 4500m";
-    position: absolute; bottom: 0; left: 0; right: 0;
-    font-size: 10px; color: #475569; letter-spacing: 470px; padding-left: 500px; pointer-events: none;
+  min-height:60px;
+  background-image: linear-gradient(90deg, #1e293b 1px, transparent 1px);
+  background-size: 200px 100%; /* Vạch kẻ mỗi 200px */
 }
 
-.finish{position:absolute;right:10px;top:0;bottom:0;width:10px;background:repeating-linear-gradient(45deg, #ef4444, #ef4444 10px, #fff 10px, #fff 20px);z-index:1; border-left: 2px solid #fff;}
+.finish{position:absolute;right:10px;top:0;bottom:0;width:12px;background:repeating-linear-gradient(45deg, #ef4444, #ef4444 10px, #fff 10px, #fff 20px);z-index:1;}
 
 /* --- Con vịt --- */
 .duck{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;gap:8px;
   font-size:18px; font-weight: 600;
-  margin:12px 0;
+  margin:15px 0;
   position:relative;
   left:0;
   white-space:nowrap;
   z-index:2;
-  transition: transform 0.2s, filter 0.2s; 
+  transition: transform 0.3s ease-out; /* Mượt mà hơn */
 }
-.duck span:first-child {font-size: 26px; transition: all 0.2s;}
+.duck span:first-child {font-size: 28px; display: inline-block;}
 
-/* Hiệu ứng đặc biệt */
-.duck.stunned { opacity: 0.5; filter: grayscale(100%); }
-.duck.stunned span:first-child { transform: rotate(180deg); } /* Lộn cổ */
-
-.duck.boosted span:first-child { transform: scale(1.5); filter: drop-shadow(0 0 10px orange); }
-.duck.fury { color: #f87171; }
-.duck.fury span:first-child { animation: shake 0.1s infinite; filter: drop-shadow(0 0 5px red); }
-
-@keyframes shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  50% { transform: translate(-1px, -1px) rotate(-1deg); }
-  100% { transform: translate(1px, -1px) rotate(1deg); }
+/* Hiệu ứng TRỰC QUAN để nhìn rõ bứt tốc */
+.duck.boosted {
+    filter: drop-shadow(0 0 8px #fbbf24);
 }
+.duck.boosted span:first-child {
+    transform: scale(1.3) skewX(-10deg); /* Nghiêng người về phía trước */
+    animation: fire 0.2s infinite alternate;
+}
+@keyframes fire { from{filter: brightness(1);} to{filter: brightness(1.5) contrast(1.2);} }
+
+.duck.stunned { opacity: 0.4; filter: grayscale(100%) blur(1px); }
+.duck.fury { color: #f87171; text-shadow: 0 0 5px red; }
 
 /* --- Bảng xếp hạng --- */
 #board {padding:0; margin-top: 10px;}
 #board li{
-  list-style:none; margin:8px 0; padding:12px; border-radius:10px; background:#1e293b; color:#fff; 
-  font-weight:600; display:flex; justify-content:space-between; border: 1px solid #334155;
-  animation: popIn 0.3s ease-out;
+  list-style:none; margin:8px 0; padding:12px; border-radius:10px; background:#1e293b; display:flex; justify-content:space-between; border: 1px solid #334155;
 }
-#board li.top1{background:#fde047;color:#000; border-color:#facc15}
-#board li.top2{background:#e5e7eb;color:#000; border-color:#d1d5db}
-#board li.top3{background:#fb923c;color:#000; border-color:#f97316}
+#board li.top1{background:#fde047;color:#000;}
 
 @keyframes popIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
 </style>
@@ -115,26 +103,20 @@ button:active{transform:scale(0.98)}
 <body>
 <div class="container">
   <div class="card">
-    <h2 style="text-align:center">🐤 Duck Racing — Chaos Edition</h2>
-
-    <p>Nhập tên các tay đua:</p>
-    <textarea id="names" placeholder="Vịt Donal&#10;Vịt Daisy&#10;Psyduck..."></textarea>
+    <h2 style="text-align:center">🐤 Duck Racing — Smooth Mode</h2>
+    <textarea id="names" placeholder="Nhập tên vịt..."></textarea>
 
     <div class="buttons">
-      <button id="startBtn">🏁 Bắt đầu Chaos</button>
+      <button id="startBtn">🏁 Đua ngay</button>
       <button id="resetBtn" class="reset">🔄 Làm mới</button>
     </div>
 
     <div class="timer" id="timer">0.00s</div>
-    
-    <div class="commentary-box" id="commentary">
-        📢 Sẵn sàng...
-    </div>
+    <div class="commentary-box" id="commentary">📢 Sẵn sàng...</div>
 
     <div class="track-scroll-wrapper" id="scrollContainer">
         <div class="track" id="track">
           <div class="finish"></div>
-          <div style="color:#475569; text-align:center; padding:20px; width: 300px;">Đường đua tử thần dài 5000m...</div>
         </div>
     </div>
 
@@ -153,18 +135,31 @@ const timerEl = document.getElementById("timer");
 const commentaryEl = document.getElementById("commentary");
 
 let ducks = [], results = [], running = false, startTime = 0, timerLoop = null, finishX = 0;
-let defaultIcons = ['🦆', '🐔', '🐧', '🐦', '🦅'];
+let msgQueue = [];
+let isAnnouncing = false;
 
-function log(msg) {
-    commentaryEl.innerHTML = `<span class="blink-text">📢 TIN NÓNG:</span> ${msg}`;
+function log(msg, important = false) {
+    if(important) msgQueue.unshift(msg);
+    else msgQueue.push(msg);
+    processQueue();
+}
+
+function processQueue() {
+    if(isAnnouncing || msgQueue.length === 0) return;
+    isAnnouncing = true;
+    const msg = msgQueue.shift();
+    commentaryEl.innerHTML = `📢 ${msg}`;
+    commentaryEl.classList.add("active");
+    setTimeout(() => {
+        commentaryEl.classList.remove("active");
+        isAnnouncing = false;
+        processQueue();
+    }, 1800); // Tăng thời gian đọc lên 1.8s
 }
 
 function reset(){
-  running = false;
-  results = [];
-  board.innerHTML = "";
-  timerEl.textContent = "0.00s";
-  commentaryEl.textContent = "📢 Sẵn sàng...";
+  running = false; results = []; board.innerHTML = ""; timerEl.textContent = "0.00s";
+  msgQueue = []; isAnnouncing = false; commentaryEl.textContent = "📢 Sẵn sàng...";
   clearInterval(timerLoop);
   scrollContainer.scrollLeft = 0;
   track.innerHTML = '<div class="finish"></div>';
@@ -173,139 +168,93 @@ function reset(){
 function startRace(){
   if(running) return;
   const names = document.getElementById("names").value.split("\n").map(s => s.trim()).filter(Boolean);
-  if(!names.length){ alert("Nhập tên vịt đi bạn ơi!"); return; }
-
+  if(!names.length) return;
   reset(); 
-  finishX = track.offsetWidth - 100; 
+  finishX = track.offsetWidth - 120; 
 
   ducks = names.map((name) => {
     const d = document.createElement("div");
     d.className = "duck";
-    // Setup chỉ số
     d.dataset.x = 0;
     d.dataset.name = name;
     d.dataset.done = "0";
-    d.dataset.status = "run"; // run | sleep | boost
-    d.dataset.lockTime = 0;   // Thời gian bị khóa status
-    
-    // Icon random
-    const icon = defaultIcons[Math.floor(Math.random() * defaultIcons.length)];
-    d.dataset.icon = icon;
-    
-    d.innerHTML = `<span>${icon}</span><span>${name}</span>`;
-    d.style.left = "0px";
+    d.dataset.status = "run";
+    d.dataset.lockTime = 0;
+    d.dataset.speed = 2 + Math.random() * 1; // Tốc độ cơ sở
+    d.innerHTML = `<span>🦆</span><span>${name}</span>`;
     track.appendChild(d);
     return d;
   });
 
   running = true;
   startTime = performance.now();
-
   timerLoop = setInterval(() => {
     const t = ((performance.now() - startTime) / 1000).toFixed(2);
     timerEl.textContent = "⏱ " + t + "s";
   }, 50);
-
   requestAnimationFrame(loop);
 }
 
 function loop(){
   if(!running) return;
-
   let finishedCount = 0;
   let leadingX = 0; 
-  let lastX = 999999;
-
-  // Tìm vị trí đầu và cuối để tính toán logic "lội ngược dòng"
-  ducks.forEach(d => {
-      let x = parseFloat(d.dataset.x);
-      if(d.dataset.done === "0") {
-          if(x > leadingX) leadingX = x;
-          if(x < lastX) lastX = x;
-      }
-  });
+  ducks.forEach(d => { if(d.dataset.done === "0" && parseFloat(d.dataset.x) > leadingX) leadingX = parseFloat(d.dataset.x); });
 
   ducks.forEach(d => {
-    if(d.dataset.done === "1") {
-      finishedCount++;
-      return;
-    }
+    if(d.dataset.done === "1") { finishedCount++; return; }
 
     let x = parseFloat(d.dataset.x);
     let name = d.dataset.name;
-    let iconSpan = d.querySelector("span:first-child");
-    let status = d.dataset.status;
     let lockTime = parseInt(d.dataset.lockTime);
+    let status = d.dataset.status;
 
-    // --- XỬ LÝ TRẠNG THÁI ---
+    // QUẢN LÝ TRẠNG THÁI
     if(lockTime > 0) {
         d.dataset.lockTime = lockTime - 1;
-        
-        // Nếu đang ngủ thì không di chuyển
         if(status === "sleep") return; 
-    } else {
-        // Hết thời gian hiệu ứng -> Reset về bình thường
-        if(status !== "run") {
-            d.className = "duck"; // Xóa class effect
-            d.dataset.status = "run";
-            iconSpan.textContent = d.dataset.icon;
-        }
+    } else if(status !== "run") {
+        d.className = "duck";
+        d.dataset.status = "run";
     }
 
-    // --- TÍNH TOÁN DI CHUYỂN ---
-    let move = 2 + Math.random() * 2; // Tốc độ cơ bản (nhanh hơn bản cũ)
+    // TÍNH TOÁN TỐC ĐỘ (ĐÃ LÀM CHẬM LẠI ĐỂ DỄ NHÌN)
+    let currentSpeed = parseFloat(d.dataset.speed) + (Math.random() * 0.5);
 
-    // 1. LOGIC BOOST (Tên lửa)
     if(status === "boost") {
-        move += 15; // Tốc độ bàn thờ
+        currentSpeed += 6; // Giảm từ 15 xuống 6 để bứt tốc mượt mà
     }
     
-    // 2. LOGIC FURY (Lội ngược dòng)
-    // Nếu bị bỏ lại quá 500px so với người dẫn đầu -> Hóa thú
-    if(status === "run" && (leadingX - x > 500)) {
+    // Fury Mode (Lội ngược dòng)
+    if(status === "run" && (leadingX - x > 800)) {
         d.classList.add("fury");
-        move += 6; // Chạy nhanh hơn để đuổi theo
-        iconSpan.textContent = "👹"; 
-    } else if (status === "run") {
-        d.classList.remove("fury");
-        if(iconSpan.textContent === "👹") iconSpan.textContent = d.dataset.icon;
+        currentSpeed += 3.5; 
     }
 
-    // --- SỰ KIỆN NGẪU NHIÊN (Chỉ xảy ra khi đang chạy bình thường) ---
-    if(status === "run" && Math.random() < 0.015) { // 1.5% cơ hội mỗi frame
-        const dice = Math.random();
-        
-        if(dice < 0.3) {
-            // 30% dính CHOÁNG (Sleep)
+    // RANDOM EVENTS (Tỉ lệ cực thấp để tin nhắn không bị chồng chéo)
+    if(status === "run" && Math.random() < 0.003) {
+        if(Math.random() < 0.5) {
             d.dataset.status = "sleep";
-            d.dataset.lockTime = 100; // Ngủ 100 frames (~1.6s)
+            d.dataset.lockTime = 100;
             d.classList.add("stunned");
-            iconSpan.textContent = "💫";
-            log(`${name} vấp vỏ chuối và ngất xỉu!`);
-        } 
-        else if (dice > 0.8) {
-            // 20% dính BOOST (Tên lửa)
+            log(`${name} đang dừng lại... thở dốc!`);
+        } else {
             d.dataset.status = "boost";
-            d.dataset.lockTime = 60; // Boost trong 60 frames (~1s)
+            d.dataset.lockTime = 120; // Kéo dài thời gian boost lên để nhìn cho rõ
             d.classList.add("boosted");
-            iconSpan.textContent = "🔥";
-            log(`${name} vừa nhặt được tên lửa!!`);
+            log(`${name} BẮT ĐẦU TĂNG TỐC!`);
         }
     }
 
-    x += move;
+    x += currentSpeed;
 
-    // Về đích
     if(x >= finishX){
       x = finishX;
       d.dataset.done = "1";
-      d.className = "duck"; // Xóa mọi effect
-      iconSpan.textContent = "🏁"; 
-      
+      d.className = "duck";
       const t = (performance.now() - startTime) / 1000;
       results.push({ name: name, time: t });
-      
-      log(`${name} ĐÃ VỀ ĐÍCH!`);
+      log(`Cán đích: ${name}!`, true);
       updateRanking();
     }
 
@@ -313,17 +262,14 @@ function loop(){
     d.style.left = x + "px";
   });
 
-  // --- CAMERA UPDATE ---
-  const centerOffset = scrollContainer.clientWidth / 2;
+  // CAMERA (LÀM MƯỢT CUỘN)
+  const centerOffset = scrollContainer.clientWidth / 3;
   if(leadingX > centerOffset) {
       scrollContainer.scrollLeft = leadingX - centerOffset;
   }
 
   if(finishedCount === ducks.length && ducks.length > 0){
-    running = false;
-    clearInterval(timerLoop);
-    timerEl.textContent = "🏁 GAME OVER";
-    log("Cuộc đua kết thúc! Xem bảng xếp hạng bên dưới.");
+    running = false; clearInterval(timerLoop);
   } else {
     requestAnimationFrame(loop);
   }
@@ -332,18 +278,10 @@ function loop(){
 function updateRanking(){
   results.sort((a,b) => a.time - b.time);
   board.innerHTML = ""; 
-
   results.forEach((r, i) => {
     const li = document.createElement("li");
-    let rankPrefix = `#${i+1}`;
-    if(i===0) rankPrefix = "🥇";
-    if(i===1) rankPrefix = "🥈";
-    if(i===2) rankPrefix = "🥉";
-
-    li.innerHTML = `<span>${rankPrefix} ${r.name}</span><span>${r.time.toFixed(2)}s</span>`;
+    li.innerHTML = `<span>#${i+1} ${r.name}</span><span>${r.time.toFixed(2)}s</span>`;
     if(i === 0) li.classList.add("top1");
-    if(i === 1) li.classList.add("top2");
-    if(i === 2) li.classList.add("top3");
     board.appendChild(li);
   });
 }
