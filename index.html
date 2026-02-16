@@ -8,86 +8,103 @@
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Dancing Script', cursive; }
 
-        /* Lớp phủ Hộp Quà */
+        /* Màn hình Hộp Quà */
         #gift-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #b30000, #660000);
+            background: radial-gradient(circle, #b30000, #4d0000);
             z-index: 100; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .gift-box { font-size: 120px; cursor: pointer; animation: bounce 1.2s infinite; filter: drop-shadow(0 0 20px #ffcc00); user-select: none; }
-        .gift-hint { color: #ffcc00; margin-top: 25px; font-size: 1.8rem; text-align: center; text-shadow: 1px 1px 5px #000; }
-        .opened { opacity: 0; pointer-events: none; transform: scale(4); }
+        .gift-box { font-size: 130px; cursor: pointer; animation: bounce 1.2s infinite; filter: drop-shadow(0 0 20px #ffcc00); }
+        .gift-hint { color: #ffcc00; margin-top: 20px; font-size: 1.8rem; text-align: center; }
+        .opened { opacity: 0; pointer-events: none; transform: scale(5); }
 
         /* Nền cây mai */
         #bg-tree {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://img.freepik.com/premium-photo/blooming-yellow-apricot-flowers-new-year-background_665455-2565.jpg') no-repeat center;
+            background: black;
             background-size: cover; z-index: 1;
             animation: treeSway 10s ease-in-out infinite;
-            filter: brightness(0.7);
+            filter: brightness(0.6);
         }
 
+        /* Cánh hoa rơi */
         .petal { position: absolute; top: -50px; z-index: 20; pointer-events: none; }
 
         /* Lời chúc */
         .content {
-            position: absolute; width: 100%; top: 20%; text-align: center;
-            z-index: 50; color: #fff; pointer-events: none;
+            position: absolute; width: 100%; top: 30%; text-align: center;
+            z-index: 50; color: #fff; pointer-events: none; padding: 0 20px; box-sizing: border-box;
         }
-        h1 { font-size: 5rem; color: #ffcc00; text-shadow: 0 0 20px #ff0000; margin: 0; }
-        p { font-size: 2.2rem; color: #ffffff; text-shadow: 2px 2px 10px #000; margin: 10px 0; min-height: 1.2em; }
-        #third-line { color: #ffeb3b; font-size: 1.8rem; } /* Màu vàng sáng cho dòng cuối */
+        h1 { font-size: 4.5rem; color: #ffcc00; text-shadow: 0 0 20px #ff0000; margin: 0; }
+        p { font-size: 2.5rem; color: #ffffff; text-shadow: 2px 2px 10px #000; margin-top: 30px; line-height: 1.4; }
 
         canvas { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; }
 
-        @keyframes treeSway { 0%, 100% { transform: scale(1.1) rotate(0deg); } 50% { transform: scale(1.15) rotate(1.5deg); } }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-40px); } 60% { transform: translateY(-20px); } }
-        @keyframes petalFall { to { transform: translateY(105vh) rotate(720deg) translateX(100px); opacity: 0; } }
+        @keyframes treeSway { 0%, 100% { transform: scale(1.1) rotate(0deg); } 50% { transform: scale(1.15) rotate(1.2deg); } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-40px); } }
+        @keyframes petalFall { to { transform: translateY(105vh) rotate(720deg) translateX(80px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="gift-overlay">
-        <div class="gift-box" onclick="startCelebration()">🎁</div>
-        <div class="gift-hint">Bấm vào hộp quà để nhận lộc đầu xuân 2026!</div>
+        <div class="gift-box" onclick="openLuckyGift()">🎁</div>
+        <div class="gift-hint">Chạm vào hộp quà để nhận lời chúc may mắn!</div>
     </div>
 
     <div id="bg-tree"></div>
     
     <div class="content">
-        <h1 id="title"></h1>
-        <p id="sub-title"></p>
-        <p id="third-line"></p> </div>
+        <h1 id="main-title"></h1>
+        <p id="lucky-wish"></p>
+    </div>
 
     <canvas id="fireworks"></canvas>
 
     <script>
-        let animationStarted = false;
+        // Danh sách 5 lời chúc ngẫu nhiên
+        const wishes = [
+            "Chúc bạn năm mới tiền vào như nước, tiền ra nhỏ giọt như cafe phin!",
+            "Vạn sự như ý - Tấn tài tấn lộc - An khang thịnh vượng!",
+            "Năm mới Bính Ngọ: Đong cho đầy hạnh phúc – Gói cho trọn lộc tài!",
+            "Chúc bạn 365 ngày hạnh phúc, 52 tuần như ý, 12 tháng an vui!",
+            "Sức khỏe dẻo dai, công việc thuận lợi, túi tiền rủng rỉnh, tình yêu phơi phới!",
+            "Chúc bạn năm mới phi nhanh như ngựa, việc gì cũng thông, đích nào cũng tới!",
+            "Tiền vào cửa trước, vàng vào cửa sau, hai cái gặp nhau, chui vào két sắt.",
+            "Ngựa phi đường xa mới biết ngựa hay. Chúc bạn năm 2026 bền bỉ với mục tiêu, mạnh mẽ trước thử thách và cán đích một cách huy hoàng nhất!",
+            "Chúc sự nghiệp của bạn trong năm Bính Ngọ sẽ có những bước nhảy vọt, 'ngựa hay không ngại đường xa'"
+        ];
 
-        function startCelebration() {
-            if(animationStarted) return;
-            animationStarted = true;
+        let isOpened = false;
+
+        function openLuckyGift() {
+            if (isOpened) return;
+            isOpened = true;
+
+            // Hiệu ứng mở quà
             document.getElementById('gift-overlay').classList.add('opened');
-            
+
+            // Chọn ngẫu nhiên 1 lời chúc
+            const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+
             setTimeout(() => {
                 startFireworks();
-                startFallingFlowers();
+                startFlowers();
                 
-                // Hiệu ứng chữ chạy tuần tự
-                typeWriter("Chúc Mừng Năm Mới 2026", "title", 100, () => {
-                    typeWriter("Vạn Sự Như Ý - An Khang Thịnh Vượng", "sub-title", 80, () => {
-                        typeWriter("Coder: Huy Lê", "third-line", 80);
-                    });
+                // Hiển thị tiêu đề trước
+                typeWriter("Mừng Xuân Bính Ngọ 2026", "main-title", 100, () => {
+                    // Sau đó hiển thị lời chúc ngẫu nhiên
+                    typeWriter(randomWish, "lucky-wish", 60);
                 });
             }, 600);
         }
 
-        // Cải tiến hàm typeWriter để có thể gọi liên tiếp (callback)
         function typeWriter(text, elementId, speed, callback) {
             let i = 0;
             const elem = document.getElementById(elementId);
+            elem.innerHTML = ""; // Xóa nội dung cũ
             function type() {
                 if (i < text.length) {
                     elem.innerHTML += text.charAt(i);
@@ -100,42 +117,42 @@
             type();
         }
 
-        function startFallingFlowers() {
+        function startFlowers() {
             setInterval(() => {
                 const petal = document.createElement('div');
                 petal.className = 'petal';
-                const isMai = Math.random() > 0.5;
-                petal.innerHTML = isMai ? '🌼' : '🌸';
+                petal.innerHTML = Math.random() > 0.5 ? '🌼' : '🌸';
                 petal.style.fontSize = (Math.random() * 20 + 15) + 'px';
                 petal.style.left = Math.random() * 100 + 'vw';
-                const duration = Math.random() * 4 + 4;
+                const duration = Math.random() * 4 + 5;
                 petal.style.animation = `petalFall ${duration}s linear forwards`;
                 document.body.appendChild(petal);
                 setTimeout(() => petal.remove(), duration * 1000);
-            }, 250);
+            }, 300);
         }
 
-        // Logic Pháo hoa (giống bản trước)
+        // Logic Pháo hoa
         const canvas = document.getElementById('fireworks');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         let particles = [];
+        
         function startFireworks() {
             function createFirework() {
                 const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height * 0.5;
-                const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-                for (let i = 0; i < 50; i++) {
-                    particles.push({x, y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, alpha: 1, color, gravity: 0.1});
+                const y = Math.random() * canvas.height * 0.4;
+                const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                for (let i = 0; i < 40; i++) {
+                    particles.push({x, y, vx:(Math.random()-0.5)*10, vy:(Math.random()-0.5)*10, alpha:1, color, g:0.1});
                 }
             }
             function animate() {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                if (Math.random() < 0.06) createFirework();
+                if (Math.random() < 0.05) createFirework();
                 particles.forEach((p, i) => {
-                    p.vx *= 0.98; p.vy *= 0.98; p.vy += p.gravity; p.x += p.vx; p.y += p.vy; p.alpha -= 0.015;
+                    p.x += p.vx; p.y += p.vy; p.vy += p.g; p.alpha -= 0.015;
                     ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
                     ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
                     if (p.alpha <= 0) particles.splice(i, 1);
